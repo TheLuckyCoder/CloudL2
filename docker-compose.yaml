@@ -1,0 +1,37 @@
+services:
+  mysql:
+    image: mysql
+    container_name: db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: donationmanager
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_volume:/var/lib/mysql
+
+  backend:
+    container_name: backend
+    image: backend
+    build: backend-main
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/donationmanager
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
+
+  frontend:
+    container_name: frontend
+    image: frontend
+    build: frontend-main
+    ports:
+      - "4200:4200"
+    depends_on:
+      - backend
+
+volumes:
+  db_volume:
